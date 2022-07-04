@@ -77,13 +77,13 @@ class CNN(nn.Module):
 
 
 # cnn_input = torch.FloatTensor(1, 1, 28, 28)
-cnn_model = CNN(1, 32, 3).to(device)
+model = CNN(1, 32, 3).to(device)
 #
 # linear_model = Linear(3136, 10).to(device)
 # linear_out = linear_model(cnn_out)
 
 criterion = torch.nn.CrossEntropyLoss().to(device)
-optimizer = optim.Adam(cnn_model.parameters(), lr=learning_rate)
+optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
 total_batch = len(dataloader)
 print('batchN :', total_batch)
@@ -95,7 +95,7 @@ for epoch in range(training_epochs):
         X = X.to(device)
         Y = Y.to(device)
 
-        hypothesis = cnn_model(X)
+        hypothesis = model(X)
 
         optimizer.zero_grad()
         cost = criterion(hypothesis, Y)
@@ -106,11 +106,23 @@ for epoch in range(training_epochs):
 
     print('[Epoch: {:>4}] cost = {:>.9}'.format(epoch + 1, avg_cost))
 
+# model save
+PATH = './weights/'
+torch.save(model, PATH + 'model.pt')  # 전체 모델 저장
+torch.save(model.state_dict(), PATH + 'model_state_dict.pt')  # 모델 객체의 state_dict 저장
+torch.save({
+    'model': model.state_dict(),
+    'optimizer': optimizer.state_dict()
+}, PATH + 'all.tar')  # 여러 가지 값 저장, 학습 중 진행 상황 저장을 위해 epoch, loss 값 등 일반 scalar 값 저장 가능
+
+load_model = torch.load(PATH + 'model.pt')  # 전체 모델을 통째로 불러옴, 클래스 선언 필수
+load_model.load_state_dict(torch.load(PATH + 'model_state_dict.pt'))  # state_dict를 불러 온 후, 모델에 저장
+
 with torch.no_grad():
     X_test = mnist_test.test_data.view(len(mnist_test), 1, 28, 28).float().to(device)
     Y_test = mnist_test.test_labels.to(device)
 
-    prediction = cnn_model(X_test)
+    prediction = load_model(X_test)
     correct_prediction = torch.argmax(prediction, 1) == Y_test
     accuracy = correct_prediction.float().mean()
     print('Accuracy :', accuracy.item())
