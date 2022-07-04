@@ -52,16 +52,16 @@ class CNN(nn.Module):
 
     def forward(self, inputs):
         conv1 = torch.relu(self.conv1(inputs))
-        print('conv1 + relu :', conv1.shape)
+        # print('conv1 + relu :', conv1.shape)
         pool1 = self.pool1(conv1)
-        print('pool1 :', pool1.shape)
+        # print('pool1 :', pool1.shape)
         conv2 = torch.relu(self.conv2(pool1))
-        print('conv2 + relu :', conv2.shape)
+        # print('conv2 + relu :', conv2.shape)
         pool2 = self.pool2(conv2)
-        print('pool2 :', pool2.shape)
+        # print('pool2 :', pool2.shape)
         out = pool2.view(pool2.size(0), -1)
         out = self.fc(out)
-        print('out :', out.shape)
+        # print('out :', out.shape)
         return out
 
 
@@ -95,29 +95,22 @@ for epoch in range(training_epochs):
         X = X.to(device)
         Y = Y.to(device)
 
-        prediction = cnn_model(X)
+        hypothesis = cnn_model(X)
 
         optimizer.zero_grad()
-        cost = criterion(prediction, Y)
+        cost = criterion(hypothesis, Y)
+        cost.backward()
         optimizer.step()
 
         avg_cost += cost / total_batch
 
     print('[Epoch: {:>4}] cost = {:>.9}'.format(epoch + 1, avg_cost))
 
-#
-# #
-# # Conv1 = nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=kernel_size,
-# #                   stride=1, padding=1)
-# # Conv2 = nn.Conv2d(in_channels=out_channels, out_channels=out_channels * 2, kernel_size=kernel_size,
-# #                   stride=1, padding=1)
-# # pool = nn.MaxPool2d(kernel_size=2, stride=2)
-# # # print(Conv1)
-# # out1 = Conv1(inputs)
-# # print('conv1 :', out1.shape)
-# # out2 = pool(out1)
-# # print('pool1 :', out2.shape)
-# # out3 = Conv2(out2)
-# # print('conv2 :', out3.shape)
-# # out4 = pool(out3)
-# # print('pool2 :', out4.shape)
+with torch.no_grad():
+    X_test = mnist_test.test_data.view(len(mnist_test), 1, 28, 28).float().to(device)
+    Y_test = mnist_test.test_labels.to(device)
+
+    prediction = cnn_model(X_test)
+    correct_prediction = torch.argmax(prediction, 1) == Y_test
+    accuracy = correct_prediction.float().mean()
+    print('Accuracy :', accuracy.item())
