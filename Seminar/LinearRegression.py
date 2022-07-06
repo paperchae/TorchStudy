@@ -65,14 +65,14 @@ for epoch in range(nb_epochs + 1):
         print('Epoch {:4d}/{} Cost: {:.6f}'.format(
             epoch, nb_epochs, cost.item()
         ))
-e = np.arange(0, nb_epochs + 1)
-print(len(e), e)
-print(len(cost_record), cost_record)
-
-plt.plot(e, cost_record)
-plt.show()
 
 new_x = torch.FloatTensor([4])
 pred_y = model(new_x)
 print('model parameters : ', list(model.parameters()))
 print('ground truth = 8, pred_y =', pred_y)
+
+e = np.arange(0, nb_epochs + 1)
+plt.plot(e, cost_record)
+plt.xlabel("epochs", labelpad=5)
+plt.ylabel("cost", labelpad=5)
+plt.show()

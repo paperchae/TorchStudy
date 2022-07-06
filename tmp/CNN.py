@@ -10,11 +10,11 @@ import torch.optim as optim
 
 # GPU Setting
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "5"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print('Device:', device)  # 출력결과: cuda
-print('Count of using GPUs:', torch.cuda.device_count())
-print('Current cuda device:', torch.cuda.current_device())
+# print('Count of using GPUs:', torch.cuda.device_count())
+# print('Current cuda device:', torch.cuda.current_device())
 
 learning_rate = 0.001
 training_epochs = 15
@@ -107,7 +107,7 @@ for epoch in range(training_epochs):
     print('[Epoch: {:>4}] cost = {:>.9}'.format(epoch + 1, avg_cost))
 
 # model save
-PATH = './weights/'
+PATH = '../weights/'
 torch.save(model, PATH + 'model.pt')  # 전체 모델 저장
 torch.save(model.state_dict(), PATH + 'model_state_dict.pt')  # 모델 객체의 state_dict 저장
 torch.save({
